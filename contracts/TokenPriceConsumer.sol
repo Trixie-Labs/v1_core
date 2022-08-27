@@ -3,7 +3,6 @@ pragma solidity ^0.8.7;
 
 import "@chainlink/contracts/src/v0.8/interfaces/AggregatorV3Interface.sol";
 import "@openzeppelin/contracts/utils/math/SafeMath.sol";
-import "@uniswap/v2-core/contracts/interfaces/IUniswapV2Pair.sol";
 
 contract TokenPriceConsumer {
 
@@ -42,18 +41,14 @@ contract TokenPriceConsumer {
         return price;
     }
 
-    function getTokenPriceInUSD(address pairAddress) public view returns (uint256) {
-        (,int256 price,,,) = priceUSDCFeed.latestRoundData();
-        (uint112 x, uint112 y,) = IUniswapV2Pair(pairAddress).getReserves();
-        uint256 dy = 10 ** (18-6);
-        uint256 tokenPerUSDC = y.mul(dy).div(x);
-        return tokenPerUSDC.mul(uint256(price));
-    }
-
-    function getDerivedPrice(address pairAddress, address _quote, uint8 _decimals) public view returns (int256) {
+    /**
+     * Given the token price a quote
+     * Returns the latest devired price 
+     */
+    function getDerivedPrice(int256 tokenPriceInUSDC, address _quote, uint8 _decimals) public view returns (int256) {
         require(_decimals > uint8(0) && _decimals <= uint8(18), "Invalid _decimals");
         int256 decimals = int256(10 ** uint256(_decimals));
-        int256 basePrice = int256(getTokenPriceInUSD(pairAddress));
+        int256 basePrice = tokenPriceInUSDC;
         uint8 baseDecimals = priceUSDCFeed.decimals();
         basePrice = scalePrice(basePrice, baseDecimals, _decimals);
         (,int256 quotePrice,,,) = AggregatorV3Interface(_quote).latestRoundData();

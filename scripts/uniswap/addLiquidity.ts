@@ -1,5 +1,4 @@
 import { Contract, BigNumber } from "ethers";
-import { parseFixed } from "@ethersproject/bignumber";
 import { initWallet1 } from "../utils/initWallet";
 import * as ERC20_ABI from "../../artifacts/contracts/ERC20/ERC20.sol/ERC20.json";
 import IUniswapV2Router02 from "@uniswap/v2-periphery/build/IUniswapV2Router02.json";
@@ -9,7 +8,7 @@ import { ERC20 } from '../../typechain-types'
 import { ethers } from "hardhat";
 
 const toWei = (num: number) => ethers.utils.parseEther(num.toString())
-const toUSDC = (num: number) =>  (num * (10 ** (18-6))).toString();
+const toUSDC = (num: number) =>  (num * (10 ** (6))).toString();
 
 async function main() {
   const signer = await initWallet1();
@@ -35,7 +34,7 @@ async function main() {
 
   //token 0
   const ERC20_0: ERC20 = new Contract(
-    "0xb18C81C85525dc0108cd7eBE48D951A0aC8578C6",
+    "0x1FD9E61afb18F572bD37204F557400b858398efC",
     ERC20_ABI.abi,
     signer
   ) as ERC20;
